@@ -65,11 +65,30 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'profile',
     underscored: true,
-    
-    
   });
 
   Model.associate = (models) => {
+    Model.belongsTo(models.location, {
+      foreignKey: 'location_id'
+    });
+    Model.belongsTo(models.industry, {
+      foreignKey: 'industry_id'
+    });
+    Model.belongsTo(models.org_size, {
+      foreignKey: 'org_size_id'
+    });
+    Model.belongsTo(models.org_type, {
+      foreignKey: 'org_type_id'
+    });
+    Model.belongsTo(models.status, {
+      foreignKey: 'status_id'
+    });
+    Model.belongsTo(models.category, {
+      foreignKey: 'category_id'
+    });
+    Model.belongsTo(models.country_count, {
+      foreignKey: 'country_count_id'
+    });
   };
 
   return Model;
