@@ -1,0 +1,28 @@
+{
+  "name": "impact-map",
+  "description": "The admin microservice of impact-map",
+  "website": "http://www.forestadmin.com/lumber",
+  "repository": "https://github.com/ForestAdmin/lumber",
+  "env": {
+    "FOREST_AUTH_SECRET": {
+      "description": "A random JWT signing secret to protect your admin API",
+      "value": "3296f4efe9e9198a048f5cb975c14bb1cfc51673b539d1844fc5f43ae1147c9288db36c85c9e6bd6ef82aaab60a7c1c1"
+    },
+    "FOREST_ENV_SECRET": {
+      "description": "The Forest environment secret",
+      "value": "ce61332d16cd9a803a16e2c2a5d3e929c59a21c0c7eb034360c25f7f29301d71"
+    },
+    "DATABASE_URL": {
+      "description": "The remote database connection URL",
+      "value": "mysql://<user>:<password>@<host>:<port>/<databaseName>"
+    },
+    "SSL_DATABASE": {
+      "description": "Specify if a SSL database connection is required.",
+      "value": "true"
+    },
+    "ENCRYPT_DATABASE": {
+      "description": "Specify if the database connection is encrypted.",
+      "value": ""
+    }
+  }
+}
