@@ -21,10 +21,12 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'location',
     underscored: true,
     timestamps: false,
-    
   });
 
   Model.associate = (models) => {
+    Model.belongsTo(models.country, {
+      foreignKey: 'country_id',
+    });
   };
 
   return Model;
