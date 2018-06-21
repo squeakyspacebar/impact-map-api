@@ -53,18 +53,19 @@ module.exports = (sequelize, DataTypes) => {
     org_url: {
       type: DataTypes.STRING,
     },
+    machine_readable: {
+      type: DataTypes.STRING,
+    },
     created_at: {
       type: DataTypes.DATE,
     },
     updated_at: {
       type: DataTypes.DATE,
     },
-    machine_readable: {
-      type: DataTypes.STRING,
-    },
   }, {
     tableName: 'profile',
     underscored: true,
+    timestamps: true,
   });
 
   Model.associate = (models) => {
