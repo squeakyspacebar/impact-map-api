@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     location_id: {
       type: DataTypes.INTEGER,
     },
-    industry_id: {
+    sector_id: {
       type: DataTypes.INTEGER,
     },
     org_size_id: {
@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     org_name: {
       type: DataTypes.STRING,
     },
-    org_profile_src: {
+    org_profile_source: {
       type: DataTypes.STRING,
     },
     org_profile_status: {
@@ -72,8 +72,8 @@ module.exports = (sequelize, DataTypes) => {
     Model.belongsTo(models.location, {
       foreignKey: 'location_id'
     });
-    Model.belongsTo(models.industry, {
-      foreignKey: 'industry_id'
+    Model.belongsTo(models.sector, {
+      foreignKey: 'sector_id'
     });
     Model.belongsTo(models.org_size, {
       foreignKey: 'org_size_id'

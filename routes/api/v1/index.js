@@ -17,26 +17,15 @@ router.get('/use-cases/', (req, res) => {
     models.use_case.findAll({
       include: [
         {
-          model: models.profile,
+          model: models.country,
           include: [
-            {
-              model: models.location,
-              include: [
-                {
-                  model: models.country,
-                  include: [
-                    models.region,
-                  ],
-                },
-              ],
-            },
-            models.status,
-            models.industry,
+            models.region,
           ],
-        }
+        },
+        models.sector,
       ],
       order: [
-        [models.profile, 'org_name', 'ASC'],
+        ['name', 'ASC'],
       ],
     }).then((values) => {
       res.send(values);

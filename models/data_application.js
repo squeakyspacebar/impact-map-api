@@ -7,31 +7,31 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true 
     },
     advocacy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
     },
     advocacy_desc: {
       type: DataTypes.STRING,
     },
     org_opt: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
     },
     org_opt_desc: {
       type: DataTypes.STRING,
     },
     use_other: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
     },
     use_other_desc: {
       type: DataTypes.STRING,
     },
     prod_srvc: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
     },
     prod_srvc_desc: {
       type: DataTypes.STRING,
     },
     research: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
     },
     research_desc: {
       type: DataTypes.STRING,
@@ -40,10 +40,12 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'data_application',
     underscored: true,
     timestamps: false,
-    
   });
 
   Model.associate = (models) => {
+    Model.belongsTo(models.profile, {
+      foreignKey: 'profile_id',
+    });
   };
 
   return Model;

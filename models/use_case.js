@@ -5,6 +5,18 @@ module.exports = (sequelize, DataTypes) => {
     profile_id: {
       type: DataTypes.INTEGER,
     },
+    country_id: {
+      type: DataTypes.INTEGER,
+    },
+    sector_id: {
+      type: DataTypes.INTEGER,
+    },
+    name: {
+      type: DataTypes.STRING,
+    },
+    url: {
+      type: DataTypes.STRING,
+    },
     short_description: {
       type: DataTypes.STRING,
     },
@@ -15,6 +27,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     data_used: {
+      type: DataTypes.STRING,
+    },
+    machine_readable: {
       type: DataTypes.STRING,
     },
     status: {
@@ -32,6 +47,12 @@ module.exports = (sequelize, DataTypes) => {
   Model.associate = (models) => {
     Model.belongsTo(models.profile, {
       foreignKey: 'profile_id',
+    });
+    Model.belongsTo(models.country, {
+      foreignKey: 'country_id',
+    });
+    Model.belongsTo(models.sector, {
+      foreignKey: 'sector_id',
     });
   };
 
