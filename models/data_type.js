@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     data_type: {
       type: DataTypes.STRING,
     },
-    data_type_other: {
+    other: {
       type: DataTypes.STRING,
     },
   }, {
