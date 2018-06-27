@@ -44,9 +44,6 @@ module.exports = (sequelize, DataTypes) => {
     org_profile_source: {
       type: DataTypes.STRING,
     },
-    org_profile_status: {
-      type: DataTypes.STRING,
-    },
     org_url: {
       type: DataTypes.STRING,
     },
