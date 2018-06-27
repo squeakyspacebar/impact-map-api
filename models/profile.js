@@ -26,9 +26,6 @@ module.exports = (sequelize, DataTypes) => {
     org_confidence: {
       type: DataTypes.INTEGER,
     },
-    no_org_url: {
-      type: DataTypes.INTEGER,
-    },
     org_additional: {
       type: DataTypes.STRING,
     },
