@@ -4,63 +4,56 @@ const router = express.Router();
 const models = require('../../../models');
 const sequelize = models.sequelize;
 
-async function getOrgAgeGroupCount (parameters) {
-  const region = parameters.region || null;
-  const minAge = parameters.minAge || null;
-  const maxAge = parameters.maxAge || null;
+const regionController = require('../../../controllers/regionController');
+const sectorController = require('../../../controllers/sectorController');
 
-  let sql ='SELECT COUNT(DISTINCT org_name) AS count ' +
-    'FROM ' +
-    'profile AS p, ' +
-    'location AS l, ' +
-    'country AS c, ' +
-    'region AS r, ' +
-    'status AS s ' +
-    'WHERE p.location_id = l.id ' +
-    'AND l.country_id = c.id ' +
-    'AND c.region_id = r.id ' +
-    'AND p.status_id = s.id ' +
-    'AND r.name = :region ' +
-    'AND s.status = "publish" ';
+router.get('/', async (req, res) => {
+  res.status(200).send('OK!');
+});
 
-  if (minAge) {
-    sql += 'AND p.org_year_founded <= YEAR(CURDATE()) - :minAge ';
-  }
+router.get('/impact-map/stats', async (req, res) => {
+  try {
+    let countryCountSQL = 'SELECT ' +
+      'COUNT(DISTINCT country.name) AS count ' +
+      'FROM profile ' +
+      'LEFT JOIN location ' +
+      'ON profile.location_id = location.id ' +
+      'LEFT JOIN country ' +
+      'ON location.country_id = country.id ' +
+      'LEFT JOIN status ' +
+      'ON profile.status_id = status.id ' +
+      'WHERE status.status = "publish"';
 
-  if (maxAge) {
-    sql += 'AND p.org_year_founded >= YEAR(CURDATE()) - :maxAge ';
-  }
-
-  let result = await sequelize
-    .query(sql, {
-      replacements: {
-        'region': region,
-        'minAge': minAge,
-        'maxAge': maxAge,
-      },
+    let countryCount = await sequelize.query(countryCountSQL, {
       type: sequelize.QueryTypes.SELECT,
-      raw: true,
     });
 
-  if (result[0]) {
-    result = result[0]['count'];
-  }
+    let organizationCountSQL = 'SELECT ' +
+      'COUNT(DISTINCT profile.org_name) AS count ' +
+      'FROM profile ' +
+      'LEFT JOIN status ' +
+      'ON profile.status_id = status.id ' +
+      'WHERE status.status = "publish"';
 
-  return result;
-}
+    let organizationCount = await sequelize.query(organizationCountSQL, {
+      type: sequelize.QueryTypes.SELECT,
+    });
 
-router.get('/', (req, res) => {
-  try {
-    res.status(200).send();
+    let result = {
+      country_count: countryCount[0]['count'],
+      organization_count: organizationCount[0]['count'],
+    };
+
+    res.send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send();
   }
 });
 
-router.get('/use-cases/', (req, res) => {
+router.get('/use-cases/', async (req, res) => {
   try {
-    models.use_case.findAll({
+    let result = await models.use_case.findAll({
       include: [
         {
           model: models.country,
@@ -73,224 +66,61 @@ router.get('/use-cases/', (req, res) => {
       order: [
         ['name', 'ASC'],
       ],
-    }).then((values) => {
-      res.send(values);
-    });
+    })
+
+    res.send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send();
   }
 });
 
-router.get('/organization-count/regions/', (req, res) => {
-  try {
-    const sql = 'SELECT ' +
-      'region.name AS region, ' +
-      '(' +
-      'SELECT COUNT(distinct(org_name)) ' +
-      'FROM ' +
-      'profile AS p, ' +
-      'location AS l, ' +
-      'country AS c, ' +
-      'region AS r, ' +
-      'status AS s ' +
-      'WHERE p.location_id = l.id ' +
-      'AND l.country_id = c.id ' +
-      'AND c.region_id = r.id ' +
-      'AND p.status_id = s.id ' +
-      'AND r.name = region.name ' +
-      'AND s.status = "publish" ' +
-      ') AS organization_count ' +
-      'FROM region ' +
-      'GROUP BY region.id';
+router.get('/regions/total-organizations',
+  regionController.totalOrganizationCount);
 
-    sequelize
-      .query(sql, { type: sequelize.QueryTypes.SELECT })
-      .then((rows) => {
-        res.send(rows);
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
+router.get('/region/:region/total-organizations',
+  regionController.regionOrganizationCount);
 
-router.get('/organization-count/', (req, res) => {
-  try {
-    const region = req.query.region;
+router.get('/region/:region/country-organization-count/',
+  regionController.countryOrganizationCounts);
 
-    const sql = 'SELECT ' +
-      'region.name AS region, ' +
-      '(' +
-      'SELECT COUNT(distinct(org_name)) ' +
-      'FROM ' +
-      'profile AS p, ' +
-      'location AS l, ' +
-      'country AS c, ' +
-      'region AS r, ' +
-      'status AS s ' +
-      'WHERE p.location_id = l.id ' +
-      'AND l.country_id = c.id ' +
-      'AND c.region_id = r.id ' +
-      'AND p.status_id = s.id ' +
-      'AND r.name = :region ' +
-      'AND s.status = "publish" ' +
-      ') AS organization_count ' +
-      'FROM region ' +
-      'WHERE region.name = :region';
+router.get('/region/:region/organization-types/',
+  regionController.organizationTypes);
 
-    sequelize
-      .query(sql, {
-        replacements: {
-          'region': region,
-        },
-        type: sequelize.QueryTypes.SELECT,
-        raw: true,
-      })
-      .then((rows) => {
-        res.send(rows[0]);
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
+router.get('/region/:region/organization-sizes/',
+  regionController.organizationSizes);
 
-router.get('/organization-types/', (req, res) => {
-  try {
-    const region = req.query.region;
+router.get('/region/:region/organization-ages/',
+  regionController.organizationAges);
 
-    let sql ='SELECT ' +
-      'type AS organization_type, ' +
-      '( ' +
-      'SELECT COUNT(p.org_name) ' +
-      'FROM ' +
-      'profile AS p, ' +
-      'org_type AS ot, ' +
-      'status AS s, ' +
-      'location AS l, ' +
-      'country AS c, ' +
-      'region AS r ' +
-      'WHERE p.location_id = l.id ' +
-      'AND l.country_id = c.id ' +
-      'AND c.region_id = r.id ' +
-      'AND p.status_id = s.id ' +
-      'AND p.org_type_id = ot.id ' +
-      'AND r.name = :region ' +
-      'AND ot.type = org_type.type ' +
-      'AND s.status = "publish" ' +
-      ') AS organization_count ' +
-      'FROM org_type ' +
-      'GROUP BY org_type.type';
+router.get('/region/:region/organization-sectors/',
+  regionController.sectorOrganizationCounts);
 
-    sequelize
-      .query(sql, {
-        replacements: {
-          'region': region,
-        },
-        type: sequelize.QueryTypes.SELECT,
-        raw: true,
-      })
-      .then((rows) => {
-        res.send(rows);
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
+router.get('/region/:region/use-cases',
+  regionController.useCases);
 
-router.get('/organization-sizes/', (req, res) => {
-  try {
-    const region = req.query.region;
+router.get('/sectors/total-organizations',
+  sectorController.totalOrganizationCount);
 
-    let sql ='SELECT ' +
-      'size AS organization_size, ' +
-      '( ' +
-      'SELECT COUNT(p.org_name) ' +
-      'FROM ' +
-      'profile AS p, ' +
-      'org_size AS os, ' +
-      'status AS s, ' +
-      'location AS l, ' +
-      'country AS c, ' +
-      'region AS r ' +
-      'WHERE p.location_id = l.id ' +
-      'AND l.country_id = c.id ' +
-      'AND c.region_id = r.id ' +
-      'AND p.status_id = s.id ' +
-      'AND p.org_size_id = os.id ' +
-      'AND r.name = :region ' +
-      'AND os.size = org_size.size ' +
-      'AND s.status = "publish" ' +
-      ') AS organization_count ' +
-      'FROM org_size ' +
-      'GROUP BY org_size.size';
+router.get('/sector/:sector/total-organizations',
+  sectorController.organizationCount);
 
-    sequelize
-      .query(sql, {
-        replacements: {
-          'region': region,
-        },
-        type: sequelize.QueryTypes.SELECT,
-        raw: true,
-      })
-      .then((rows) => {
-        res.send(rows);
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
+router.get('/sector/:sector/data-types',
+  sectorController.dataTypes);
 
-router.get('/organization-ages/', async (req, res) => {
-  try {
-    const region = req.query.region;
+router.get('/sector/:sector/organization-types',
+  sectorController.organizationTypes);
 
-    let results = [];
+router.get('/sector/:sector/organization-sizes',
+  sectorController.organizationSizes);
 
-    let queryParams = [
-      {
-        region: region,
-        maxAge: 3,
-      },
-      {
-        region: region,
-        minAge: 4,
-        maxAge: 10,
-      },
-      {
-        region: region,
-        minAge: 11,
-      }
-    ];
+router.get('/sector/:sector/organization-ages',
+  sectorController.organizationAges);
 
-    let count = null;
+router.get('/sector/:sector/organization-applications',
+  sectorController.organizationApplications);
 
-    count = await getOrgAgeGroupCount(queryParams[0]);
-    results.push({
-      'age_group': '0-3 years',
-      'organization_count': count,
-    });
-
-    count = await getOrgAgeGroupCount(queryParams[1]);
-    results.push({
-      'age_group': '4-10 years',
-      'organization_count': count,
-    });
-
-    count = await getOrgAgeGroupCount(queryParams[2]);
-    results.push({
-      'age_group': '10+ years',
-      'organization_count': count,
-    });
-
-    res.send(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
+router.get('/sector/:sector/use-cases',
+  sectorController.useCases);
 
 module.exports = router;

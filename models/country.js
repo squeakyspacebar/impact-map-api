@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
     name: {
       type: DataTypes.STRING,
     },
-    alpha3: {
+    alpha2: {
       type: DataTypes.STRING,
     },
-    alpha2: {
+    alpha3: {
       type: DataTypes.STRING,
     },
     latitude: {
