@@ -48,6 +48,12 @@ module.exports = (sequelize, DataTypes) => {
     org_profile_source: {
       type: DataTypes.STRING,
     },
+    org_profile_year: {
+      type: DataTypes.INTEGER,
+    },
+    org_year_founded: {
+      type: DataTypes.INTEGER,
+    },
     org_url: {
       type: DataTypes.STRING,
     },
