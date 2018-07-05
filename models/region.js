@@ -2,6 +2,10 @@
 
 module.exports = (sequelize, DataTypes) => {
   var Model = sequelize.define('region', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
     name: {
       type: DataTypes.STRING,
     },
@@ -10,9 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'region',
-    
     timestamps: false,
-    
   });
 
   Model.associate = (models) => {

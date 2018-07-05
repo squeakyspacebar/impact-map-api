@@ -2,6 +2,10 @@
 
 module.exports = (sequelize, DataTypes) => {
   var Model = sequelize.define('sector', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
     sector: {
       type: DataTypes.STRING,
     },

@@ -2,6 +2,10 @@
 
 module.exports = (sequelize, DataTypes) => {
   var Model = sequelize.define('country', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
     region_id: {
       type: DataTypes.INTEGER,
     },

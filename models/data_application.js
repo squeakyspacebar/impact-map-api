@@ -2,9 +2,12 @@
 
 module.exports = (sequelize, DataTypes) => {
   var Model = sequelize.define('data_application', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
     profile_id: {
       type: DataTypes.INTEGER,
-      primaryKey: true 
     },
     advocacy: {
       type: DataTypes.BOOLEAN,

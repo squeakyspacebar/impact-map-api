@@ -2,6 +2,10 @@
 
 module.exports = (sequelize, DataTypes) => {
   var Model = sequelize.define('income_level', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
     income_level: {
       type: DataTypes.STRING,
     },
@@ -12,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'income_level',
     underscored: true,
     timestamps: false,
-    
   });
 
   Model.associate = (models) => {
