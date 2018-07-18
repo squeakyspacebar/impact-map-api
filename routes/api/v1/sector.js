@@ -4,41 +4,30 @@ const router = express.Router();
 const models = require('../../../models');
 const sequelize = models.sequelize;
 
-router.get('/sectors/organization-count');
+const sectorController = require('../../../controllers/sectorController');
 
-router.get('/organization-count/sectors', (req, res) => {
-  try {
-    const sector = req.query.sector;
+router.get('/sectors/total-organizations',
+  sectorController.totalOrganizationCount);
 
-    const sql = 'SELECT ' +
-      'sector.sector AS sector, ' +
-      '(' +
-      'SELECT COUNT(distinct(org_name)) ' +
-      'FROM ' +
-      'profile AS p, ' +
-      'location AS l, ' +
-      'country AS c, ' +
-      'sector AS s, ' +
-      'status AS st ' +
-      'WHERE p.location_id = l.id ' +
-      'AND l.country_id = c.id ' +
-      'AND p.sector_id = s.id ' +
-      'AND p.status_id = st.id ' +
-      'AND s.sector = sector.sector ' +
-      'AND st.status = "publish" ' +
-      ') AS organization_count ' +
-      'FROM sector ' +
-      'GROUP BY sector.id';
+router.get('/sector/:sector/total-organizations',
+  sectorController.organizationCount);
 
-    sequelize
-      .query(sql, { type: sequelize.QueryTypes.SELECT })
-      .then((rows) => {
-        res.send(rows);
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
+router.get('/sector/:sector/data-types',
+  sectorController.dataTypes);
+
+router.get('/sector/:sector/organization-types',
+  sectorController.organizationTypes);
+
+router.get('/sector/:sector/organization-sizes',
+  sectorController.organizationSizes);
+
+router.get('/sector/:sector/organization-ages',
+  sectorController.organizationAges);
+
+router.get('/sector/:sector/organization-applications',
+  sectorController.organizationApplications);
+
+router.get('/sector/:sector/use-cases',
+  sectorController.useCases);
 
 module.exports = router;
