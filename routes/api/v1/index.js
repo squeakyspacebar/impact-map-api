@@ -48,29 +48,4 @@ router.get('/impact-map/stats', async (req, res) => {
   }
 });
 
-router.get('/impact-map/use-cases/', async (req, res) => {
-  try {
-    let result = await models.use_case.findAll({
-      include: [
-        {
-          model: models.country,
-          include: [
-            models.region,
-          ],
-        },
-        models.sector,
-      ],
-      order: [
-        ['name', 'ASC'],
-      ],
-      logging: console.log,
-    })
-
-    res.send(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send();
-  }
-});
-
 module.exports = router;
