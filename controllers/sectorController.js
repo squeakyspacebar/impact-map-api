@@ -38,7 +38,6 @@ async function getOrgAgeGroupCount (parameters) {
     result = result[0]['count'];
   }
 
-  console.log(parameters, result);
   return result;
 }
 
@@ -182,23 +181,21 @@ exports.organizationSizes = async function (req, res) {
     const sector = req.params.sector;
 
     let sql = 'SELECT ' +
-      'size AS organization_size, ' +
-      '( ' +
-      'SELECT COUNT(p.org_name) ' +
-      'FROM ' +
-      'profile AS p, ' +
-      'org_size AS os, ' +
-      'sector AS s, ' +
-      'status AS st ' +
-      'WHERE p.sector_id = s.id ' +
-      'AND p.status_id = st.id ' +
-      'AND p.org_size_id = os.id ' +
-      'AND s.sector = :sector ' +
-      'AND os.size = org_size.size ' +
+      'COALESCE(size, "N/A") AS organization_size, ' +
+      'COUNT(*) AS organization_count ' +
+      'FROM profile AS p ' +
+      'JOIN sector AS s ' +
+      'ON p.sector_id = s.id ' +
+      'JOIN status AS st ' +
+      'ON p.status_id = st.id ' +
+      'LEFT JOIN org_size AS os ' +
+      'ON p.org_size_id = os.id ' +
+      'WHERE p.sector_id IN ( ' +
+      'SELECT id ' +
+      'FROM sector ' +
+      'WHERE sector = :sector) ' +
       'AND st.status = "publish" ' +
-      ') AS organization_count ' +
-      'FROM org_size ' +
-      'GROUP BY org_size.size ' +
+      'GROUP BY os.size ' +
       'ORDER BY ' +
       'CASE ' +
       'WHEN size = "1 to 10" ' +
@@ -211,6 +208,8 @@ exports.organizationSizes = async function (req, res) {
       'THEN 4 ' +
       'WHEN size = "1000+" ' +
       'THEN 5 ' +
+      'WHEN size IS NULL ' +
+      'THEN 6 ' +
       'END';
 
     let result = await sequelize.query(sql, {
