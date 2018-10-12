@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
-require('dotenv').load();
+var path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 var app = require('../app');
 var debug = require('debug')('{name}:server');
 var http = require('http');
